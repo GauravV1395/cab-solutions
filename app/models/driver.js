@@ -42,7 +42,7 @@ const driverSchema = new Schema ({
     car_type: {
         type: String,
         required: true,
-        enum: ['sedan', 'hatchback','electric','tt']
+        enum: ['sedan', 'hatchback','electric','tt', 'shuttle']
     },
 
     reg_num: {
@@ -51,12 +51,6 @@ const driverSchema = new Schema ({
         unique: true,
         minlength: 2,
         maxlength: 20
-    },
-
-    blood_group: {
-        type: String,
-        required: true,
-        enum: ['O+', 'O-', 'AB+', 'AB-', 'B+', 'B-', 'A+', 'A-']
     },
 
     aadhar_number: {
@@ -72,7 +66,13 @@ const driverSchema = new Schema ({
         unique: true,
         minlength: 10,
         maxlength: 20
-    }
+    },
+
+    blood_group: {
+        type: String,
+        required: true,
+        enum: ['O+', 'O-', 'AB+', 'AB-', 'B+', 'B-', 'A+', 'A-']
+    },
 
 });
 
