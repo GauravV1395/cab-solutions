@@ -20,7 +20,7 @@ const employeeSchema = new Schema({
                 return validator.isEmail(value);
             },
             message: function () {
-                return 'invalid email format';
+                return 'invalid email format'; 
             }
         }
     },
