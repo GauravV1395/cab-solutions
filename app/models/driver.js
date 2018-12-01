@@ -26,10 +26,9 @@ const driverSchema = new Schema ({
     },
 
     mobile_number: {
-        type: Number,
+        type: String,
         required: true,
         unique: true,
-        minlength: 10
     },
 
     address: {
@@ -54,10 +53,9 @@ const driverSchema = new Schema ({
     },
 
     aadhar_number: {
-        type: Number,
+        type: String,
         required: true,
-        unique: true,
-        minlength: 12
+        unique: true
     },
 
     driving_license: {

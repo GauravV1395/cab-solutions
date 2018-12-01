@@ -33,7 +33,7 @@ const employeeSchema = new Schema({
     },
 
     mobile_number: {
-        type: Number,
+        type: String,
         required: true,
         unique: true,
         minlength: 10
