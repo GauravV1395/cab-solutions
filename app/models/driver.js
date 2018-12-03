@@ -72,6 +72,11 @@ const driverSchema = new Schema ({
         enum: ['O+', 'O-', 'AB+', 'AB-', 'B+', 'B-', 'A+', 'A-']
     },
 
+    trips: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Trip'
+    }]
+
 });
 
 const Driver = mongoose.model('Driver', driverSchema);

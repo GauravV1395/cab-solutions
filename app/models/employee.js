@@ -49,7 +49,12 @@ const employeeSchema = new Schema({
         type: String,
         required: true,
         enum: ['O+', 'O-', 'AB+', 'AB-', 'B+', 'B-', 'A+', 'A-']
-    }
+    },
+
+    trips: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Trip'
+    }]
 });
 
 const Employee = mongoose.model('Employee', employeeSchema);
