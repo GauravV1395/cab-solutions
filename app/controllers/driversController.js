@@ -21,7 +21,7 @@ router.post('/', (req,res) => {
 // to get all drivers
 
 router.get('/', (req,res) => {
-    Driver.find().then((driver) => {
+    Driver.find().populate('trips').then((driver) => {
         res.send(driver);
     }).catch((err) => {
         res.send(err);
@@ -67,6 +67,18 @@ router.delete('/:id', validateID, (req,res) => {
         res.send(err);
     });
 })
+
+// view driver lists
+
+router.get('/:id/trips', validateID, (req,res) => {
+    let id = req.params.id;
+    Driver.findById(id).populate('trips').then((driver) => {
+        res.send(driver.trips);
+    }).catch((err) => {
+        res.send(err);
+    });
+})
+
 
 module.exports = {
     driversController: router

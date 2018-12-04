@@ -7,7 +7,7 @@ const { Driver } = require('../models/driver');
 
 // post trip
 
-router.post('/', (req,res) => {
+router.post('/', (req, res) => {
     let body = req.body;
     let trip = new Trip(body);
     trip.save().then((trip) => {
@@ -22,7 +22,7 @@ router.post('/', (req,res) => {
 
 // get all trips.
 
-router.get('/', (req,res) => {
+router.get('/', (req, res) => {
     Trip.find().populate('employees').populate('driver').then((trips) => {
         res.send(trips);
     }).catch((err) => {
@@ -32,7 +32,7 @@ router.get('/', (req,res) => {
 
 // get one trip.
 
-router.get('/:id', (req,res) => {
+router.get('/:id', (req, res) => {
     let id = req.params.id;
     Trip.findById(id).populate('employees').populate('driver').then((trip) => {
         res.send(trip);
@@ -43,34 +43,63 @@ router.get('/:id', (req,res) => {
 
 // update a trip.
 
-router.put('/:id', validateID, (req,res) => {
+router.put('/:id', validateID, (req, res) => {
     let tripid = req.params.id;
     let body = req.body;
-    let employees = req.body.employees;
-    console.log(employees, "employees");
-    //let driver = this.driver;
-    Trip.findByIdAndUpdate({ _id: tripid }, { $set: body }, {new: true, runValidators: true}).then((trip) => {
-        res.send({
-            trip,
-            notice: 'successfully updated.'
-        });
-    }).catch((err) => {
-        res.send(err);
-    });
-})
+    Trip.findById(tripid).then((trip) => {
+        if (body.hasOwnProperty('employees')) {
+            body.employees.forEach(function (n) {
+                if (trip.employees.includes(n)) {
+                    Employee.updateMany({ _id: { $in: trip.employees } }, { $pull: { trips: tripid } }).then((employees) => {
+                        console.log(employees);
+                    });
+                    
+               
+                } else {
+                    
+                    Employee.updateMany({_id: {$in: employees}}, {$push: {trips: tripId}}).then((employees) => {
+                        console.log(employees);
+                    });
+                }
+            })
+        } else if (body.hasOwnProperty('driver')){
+            console.log(trip.driver, "driver");
+            console.log(body.driver, "driver");
+            if (trip.driver === body.driver) {
+                      
+                Driver.updateMany({_id: trip.driver}, {$pull: {trips: tripid}}).then((driver) => {  
+                    console.log(driver);
+                });
+            } else {
+                Driver.updateMany({_id: driver}, {$push: {trips: tripId}}).then((driver) => {
+                    console.log(driver);
+                }); 
+            }
+        }
+        trip.set(body);
+        trip.save();
+        res.send(trip);
+    })
 
+})
 // delete a trip
 
-router.delete('/:id', validateID, (req,res) => {
-    let id = req.params.id;
-    Trip.findByIdAndRemove(id).then((trip) => {
+router.delete('/:id', validateID, (req, res) => {
+    let tripid = req.params.id;
+    Trip.findByIdAndRemove(tripid).then((trip) => {
+        Employee.updateMany({ _id: { $in: trip.employees } }, { $pull: { trips: tripid } }).then((employees) => {
+            console.log(employees);
+        });     
+        Driver.updateMany({_id: trip.driver}, {$pull: {trips: tripid}}).then((driver) => {  
+            console.log(driver);
+        });
         res.send({
             trip,
             notice: 'successfully removed'
         });
     }).catch((err) => {
         res.send(err);
-    });
+    });    
 })
 
 module.exports = {

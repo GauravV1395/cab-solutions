@@ -21,7 +21,7 @@ router.post('/', (req,res) => {
 // get all employees
 
 router.get('/', (req,res) => {
-    Employee.find().then((employee) => {
+    Employee.find().populate('trips').then((employee) => {
         res.send(employee);
     }).catch((err) => {
         res.send(err);
@@ -68,6 +68,18 @@ router.delete('/:id', validateID, (req,res) => {
         res.send(err);
     });
 })
+
+// view trips
+
+router.get('/:id/trips', validateID, (req,res) => {
+    let id = req.params.id;
+    Employee.findById(id).populate('trips').then((employee) => {
+        res.send(employee.trips);
+    }).catch((err) => {
+        res.send(err);
+    })
+})
+
 
 module.exports = {
     employeesController: router
