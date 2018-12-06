@@ -4,6 +4,10 @@ const { Trip } = require('../models/trip');
 const { validateID } = require('../middlewares/utilitites');
 const { Employee } = require('../models/employee');
 const { Driver } = require('../models/driver');
+const twilio = require('twilio');
+const accountSid = "ACd91ff63c40a32b0895dff4a1dfa172c8";
+const authToken = "d5705e40d58587f060128f80bfa1b137";
+const client = require('twilio')(accountSid, authToken);
 
 // post trip
 
@@ -52,6 +56,7 @@ router.get("/driver/:id", (req,res) => {
     })
 })
 
+
 // delete/add employee from a trip as well as update a trip.
 
 
@@ -69,8 +74,40 @@ router.put('/:id', validateID, (req, res) => {
         });
     }
     Trip.updateOne({_id: tripid}, {employees: req.body.employees,driver: req.body.driver,shift: req.body.shift,route: req.body.route,pickup: req.body.pickup}).then((res) => {
-        removeFromEmployee(tripid,req.body.removedemployee,req.body.employees);
+        removeFromEmployee(tripid,req.body.removedEmployee,req.body.employees);
         console.log(res);
+        req.body.employees.forEach(function (n) {
+            Employee.findById(n).then((employee) => {
+                Driver.findById(req.body.driver).then((driver) => {
+                    // client.messages
+                    // .create({
+                    //     body: `Driver: ${driver.name}, Mobile number: ${driver.mobile_number}, pick_up: ${req.body.pick_up}, route: ${req.body.route}`,
+                    //     from: "+1 859 697 0416",
+                    //     to: employee.mobile_number
+                    // }).then(message => console.log(message.body)).done();
+                    client.messages
+                    .create({
+                        body: `Employee: ${employee.name}, mobile Number: ${employee.mobile_number}, pick_up: ${req.body.pick_up}, route: ${req.body.route}`,
+                        from: "+1 859 697 0416",
+                        to: driver.mobile_number
+                    }).then(message => console.log(message.sid)).done();
+                })
+                console.log(employee);    
+            });
+        })
+        console.log(req.body.removedEmployee);
+        if (req.body.removedEmployee.length > 0) {
+        req.body.removedEmployee.forEach((n) => {
+            Employee.findById(n).then((employee) => {
+                client.messages
+                .create({
+                    body: "your trip details have been changed. You will receive the details shortly.",
+                    from: "+1 859 697 0416",
+                    to: employee.mobile_number
+                }).then(message => console.log(message.sid)).done();
+            })
+        })
+    }
     })
 });
 
