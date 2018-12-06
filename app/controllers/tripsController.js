@@ -41,47 +41,41 @@ router.get('/:id', (req, res) => {
     })
 })
 
-// update a trip.
+// get all the trips of a particular driver.
+
+router.get("/driver/:id", (req,res) => {
+    let id = req.params.id;
+    console.log(id);
+    Trip.find({driver: id}).then((trip) => {
+        console.log(trip);
+        res.send(trip);
+    })
+})
+
+// delete/add employee from a trip as well as update a trip.
+
 
 router.put('/:id', validateID, (req, res) => {
     let tripid = req.params.id;
-    let body = req.body;
-    Trip.findById(tripid).then((trip) => {
-        if (body.hasOwnProperty('employees')) {
-            body.employees.forEach(function (n) {
-                if (trip.employees.includes(n)) {
-                    Employee.updateMany({ _id: { $in: trip.employees } }, { $pull: { trips: tripid } }).then((employees) => {
-                        console.log(employees);
-                    });
-                    
-               
-                } else {
-                    
-                    Employee.updateMany({_id: {$in: employees}}, {$push: {trips: tripId}}).then((employees) => {
-                        console.log(employees);
-                    });
-                }
-            })
-        } else if (body.hasOwnProperty('driver')){
-            console.log(trip.driver, "driver");
-            console.log(body.driver, "driver");
-            if (trip.driver === body.driver) {
-                      
-                Driver.updateMany({_id: trip.driver}, {$pull: {trips: tripid}}).then((driver) => {  
-                    console.log(driver);
-                });
-            } else {
-                Driver.updateMany({_id: driver}, {$push: {trips: tripId}}).then((driver) => {
-                    console.log(driver);
-                }); 
-            }
-        }
-        trip.set(body);
-        trip.save();
-        res.send(trip);
-    })
+    let body = req.body.employees;
 
-})
+    function removeFromEmployee(tripid,removedEmplyees,totoalEmployees){
+        Employee.update({_id: {$in:removedEmplyees} }, {$pull: {trips: tripid}}).then((res) => {
+            console.log(res);
+        })
+    
+        Employee.update({_id:{$in:totoalEmployees}},{$addToSet:{trips:tripid}}).then((res)=>{
+            console.log(res);
+        });
+    }
+    Trip.updateOne({_id: tripid}, {employees: req.body.employees,driver: req.body.driver,shift: req.body.shift,route: req.body.route,pickup: req.body.pickup}).then((res) => {
+        removeFromEmployee(tripid,req.body.removedemployee,req.body.employees);
+        console.log(res);
+    })
+});
+
+
+
 // delete a trip
 
 router.delete('/:id', validateID, (req, res) => {
@@ -89,8 +83,8 @@ router.delete('/:id', validateID, (req, res) => {
     Trip.findByIdAndRemove(tripid).then((trip) => {
         Employee.updateMany({ _id: { $in: trip.employees } }, { $pull: { trips: tripid } }).then((employees) => {
             console.log(employees);
-        });     
-        Driver.updateMany({_id: trip.driver}, {$pull: {trips: tripid}}).then((driver) => {  
+        });
+        Driver.updateMany({ _id: trip.driver }, { $pull: { trips: tripid } }).then((driver) => {
             console.log(driver);
         });
         res.send({
@@ -99,7 +93,7 @@ router.delete('/:id', validateID, (req, res) => {
         });
     }).catch((err) => {
         res.send(err);
-    });    
+    });
 })
 
 module.exports = {
