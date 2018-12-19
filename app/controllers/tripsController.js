@@ -47,10 +47,10 @@ router.get('/:id', (req, res) => {
 
 // get all the trips of a particular driver.
 
-router.get("/driver/:id", (req,res) => {
+router.get("/driver/:id", (req, res) => {
     let id = req.params.id;
     console.log(id);
-    Trip.find({driver: id}).then((trip) => {
+    Trip.find({ driver: id }).then((trip) => {
         console.log(trip);
         res.send(trip);
     })
@@ -64,50 +64,50 @@ router.put('/:id', validateID, (req, res) => {
     let tripid = req.params.id;
     let body = req.body.employees;
 
-    function removeFromEmployee(tripid,removedEmplyees,totoalEmployees){
-        Employee.update({_id: {$in:removedEmplyees} }, {$pull: {trips: tripid}}).then((res) => {
+    function removeFromEmployee(tripid, removedEmplyees, totoalEmployees) {
+        Employee.update({ _id: { $in: removedEmplyees } }, { $pull: { trips: tripid } }).then((res) => {
             console.log(res);
         })
-    
-        Employee.update({_id:{$in:totoalEmployees}},{$addToSet:{trips:tripid}}).then((res)=>{
+
+        Employee.update({ _id: { $in: totoalEmployees } }, { $addToSet: { trips: tripid } }).then((res) => {
             console.log(res);
         });
     }
-    Trip.updateOne({_id: tripid}, {employees: req.body.employees,driver: req.body.driver,shift: req.body.shift,route: req.body.route,pickup: req.body.pickup}).then((res) => {
-        removeFromEmployee(tripid,req.body.removedEmployee,req.body.employees);
+    Trip.updateOne({ _id: tripid }, { employees: req.body.employees, driver: req.body.driver, shift: req.body.shift, route: req.body.route, pickup: req.body.pickup }).then((res) => {
+        removeFromEmployee(tripid, req.body.removedEmployee, req.body.employees);
         console.log(res);
         req.body.employees.forEach(function (n) {
             Employee.findById(n).then((employee) => {
                 Driver.findById(req.body.driver).then((driver) => {
-                    // client.messages
-                    // .create({
-                    //     body: `Driver: ${driver.name}, Mobile number: ${driver.mobile_number}, pick_up: ${req.body.pick_up}, route: ${req.body.route}`,
-                    //     from: "+1 859 697 0416",
-                    //     to: employee.mobile_number
-                    // }).then(message => console.log(message.body)).done();
                     client.messages
-                    .create({
-                        body: `Employee: ${employee.name}, mobile Number: ${employee.mobile_number}, pick_up: ${req.body.pick_up}, route: ${req.body.route}`,
-                        from: "+1 859 697 0416",
-                        to: driver.mobile_number
-                    }).then(message => console.log(message.sid)).done();
+                        .create({
+                            body: `Driver: ${driver.name}, Mobile number: ${driver.mobile_number}, pick_up: ${req.body.pick_up}, route: ${req.body.route}`,
+                            from: "+1 859 697 0416",
+                            to: employee.mobile_number
+                        }).then(message => console.log(message.body)).done();
+                    client.messages
+                        .create({
+                            body: `Employee: ${employee.name}, mobile Number: ${employee.mobile_number}, pick_up: ${req.body.pick_up}, route: ${req.body.route}`,
+                            from: "+1 859 697 0416",
+                            to: driver.mobile_number
+                        }).then(message => console.log(message.sid)).done();
                 })
-                console.log(employee);    
+                console.log(employee);
             });
         })
         console.log(req.body.removedEmployee);
         if (req.body.removedEmployee.length > 0) {
-        req.body.removedEmployee.forEach((n) => {
-            Employee.findById(n).then((employee) => {
-                client.messages
-                .create({
-                    body: "your trip details have been changed. You will receive the details shortly.",
-                    from: "+1 859 697 0416",
-                    to: employee.mobile_number
-                }).then(message => console.log(message.sid)).done();
+            req.body.removedEmployee.forEach((n) => {
+                Employee.findById(n).then((employee) => {
+                    client.messages
+                        .create({
+                            body: "your trip details have been changed. You will receive the details shortly.",
+                            from: "+1 859 697 0416",
+                            to: employee.mobile_number
+                        }).then(message => console.log(message.sid)).done();
+                })
             })
-        })
-    }
+        }
     })
 });
 

@@ -42,7 +42,13 @@ const employeeSchema = new Schema({
     shift: {
         type: String,
         required: true,
-        enum: ['9:30-18:30', '13:30-22:30', '18:30-1:30','21:30-6:30']
+        enum: ["9:30-18:30", "13:30-22:30", "18:30-1:30","21:30-6:30"]
+    },
+
+    route: {
+        type: String,
+        required: true,
+        enum: ['Route1', 'Route2', 'Route3', 'Route4', 'Route5']
     },
 
     blood_group: {

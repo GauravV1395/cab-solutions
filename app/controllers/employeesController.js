@@ -80,6 +80,28 @@ router.get('/:id/trips', validateID, (req,res) => {
     })
 })
 
+// sort employees by using its shift.
+
+router.get('/shifts/:shift', (req,res) => {
+    let Incomingshift = req.params.shift;
+    console.log(typeof req.params.shift);
+    Employee.find({shift: Incomingshift}).then((employees) => {
+        res.send(employees);
+    }).catch((err) => {
+        res.send(err);
+    })
+})
+
+// sort employees by using routes.
+
+router.get('/route/:route', (req, res) => {
+    let Incomingroute = req.params.route;
+    Employee.find({route: Incomingroute}).then((employees) => {
+        res.send(employees);
+    }).catch((err) => {
+        res.send(err);
+    })
+})
 
 module.exports = {
     employeesController: router

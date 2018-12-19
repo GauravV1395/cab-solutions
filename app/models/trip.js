@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const { Employee } = require('../models/employee');
 const { Driver } = require('../models/driver');
-const twilio = require('twilio');
+//const twilio = require('twilio');
 const accountSid = "ACd91ff63c40a32b0895dff4a1dfa172c8";
 const authToken = "d5705e40d58587f060128f80bfa1b137";
 const client = require('twilio')(accountSid, authToken);
@@ -10,12 +10,14 @@ const client = require('twilio')(accountSid, authToken);
 const tripSchema = new Schema({
     employees: [{
         type: Schema.Types.ObjectId,
-        ref: 'Employee'
+        ref: 'Employee',
+        required: true
     }],
 
     driver: {
         type: Schema.Types.ObjectId,
-        ref: 'Driver'
+        ref: 'Driver',
+        required: true
     },
 
     date: {
@@ -32,6 +34,7 @@ const tripSchema = new Schema({
     route: {
         type: String,
         required: true,
+        enum: ['Route1', 'Route2', 'Route3', 'Route4', 'Route5']
     },
 
     pick_up: {
