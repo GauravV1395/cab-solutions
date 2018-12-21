@@ -50,10 +50,6 @@ tripSchema.pre('save', function (next) {
     next();
 })
 
-
-
-
-
 tripSchema.post('save', function (next) {
     let { driver, pick_up, route, date } = this;
     let { employees } = this;
